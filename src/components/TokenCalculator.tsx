@@ -14,18 +14,24 @@ export function TokenCalculator() {
   const somPerDay = pages * AVG_SOM;
   const saved = htmlPerDay - somPerDay;
   const costSaved = (saved / 1_000_000) * COST_PER_MTOK;
+  const htmlCost = (htmlPerDay / 1_000_000) * COST_PER_MTOK;
+  const somCost = (somPerDay / 1_000_000) * COST_PER_MTOK;
 
   return (
-    <div className="rounded-xl border border-border bg-surface p-6 md:p-8">
-      <h3 className="mb-2 text-xl font-bold text-text">Token Cost Calculator</h3>
-      <p className="mb-6 text-sm text-muted">
-        See how much your agent could save by switching from raw HTML to SOM.
+    <div className="rounded border border-border bg-surface-2 p-6 md:p-8">
+      <h3 className="font-display text-xl font-bold text-text">
+        Cost at Scale
+      </h3>
+      <p className="mt-1 font-mono text-xs text-muted">
+        Estimate daily savings switching from raw HTML to SOM
       </p>
 
-      <div className="mb-6">
-        <label className="mb-2 flex items-center justify-between text-sm">
-          <span className="text-muted">My agent fetches</span>
-          <span className="font-bold text-accent">{formatNumber(pages)} pages/day</span>
+      <div className="mt-6 mb-8">
+        <label className="mb-3 flex items-center justify-between">
+          <span className="font-mono text-xs text-muted">pages/day</span>
+          <span className="font-mono text-sm font-bold text-accent glow-teal">
+            {formatNumber(pages)}
+          </span>
         </label>
         <input
           type="range"
@@ -36,36 +42,47 @@ export function TokenCalculator() {
           onChange={(e) => setPages(Number(e.target.value))}
           className="w-full"
         />
-        <div className="mt-1 flex justify-between text-xs text-muted">
+        <div className="mt-1 flex justify-between font-mono text-[10px] text-muted/50">
           <span>100</span>
-          <span>100,000</span>
+          <span>100K</span>
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-lg border border-border bg-bg p-4">
-          <div className="text-xs text-muted">HTML tokens/day</div>
-          <div className="mt-1 text-lg font-bold text-text">
-            {formatNumber(htmlPerDay)}
+      {/* Two meters */}
+      <div className="grid gap-4 sm:grid-cols-2 mb-6">
+        <div className="rounded border border-border bg-bg p-4">
+          <div className="font-mono text-[10px] uppercase tracking-widest text-muted">
+            HTML Daily Cost
+          </div>
+          <div className="mt-2 font-mono text-2xl font-bold text-loss">
+            ${htmlCost.toFixed(2)}
+          </div>
+          <div className="mt-1 font-mono text-[10px] text-muted">
+            {formatNumber(htmlPerDay)} tokens
           </div>
         </div>
-        <div className="rounded-lg border border-border bg-bg p-4">
-          <div className="text-xs text-muted">SOM tokens/day</div>
-          <div className="mt-1 text-lg font-bold text-accent">
-            {formatNumber(somPerDay)}
+        <div className="rounded border border-border bg-bg p-4">
+          <div className="font-mono text-[10px] uppercase tracking-widest text-muted">
+            SOM Daily Cost
+          </div>
+          <div className="mt-2 font-mono text-2xl font-bold text-accent glow-teal">
+            ${somCost.toFixed(2)}
+          </div>
+          <div className="mt-1 font-mono text-[10px] text-muted">
+            {formatNumber(somPerDay)} tokens
           </div>
         </div>
-        <div className="rounded-lg border border-border bg-bg p-4">
-          <div className="text-xs text-muted">Tokens saved/day</div>
-          <div className="mt-1 text-lg font-bold text-win">
-            {formatNumber(saved)}
-          </div>
+      </div>
+
+      <div className="rounded border border-accent/30 bg-accent/5 p-4 text-center">
+        <div className="font-mono text-[10px] uppercase tracking-widest text-muted">
+          You save
         </div>
-        <div className="rounded-lg border border-border bg-bg p-4">
-          <div className="text-xs text-muted">Cost saved/day (@ $3/MTok)</div>
-          <div className="mt-1 text-lg font-bold text-win">
-            ${costSaved.toFixed(2)}
-          </div>
+        <div className="mt-1 font-mono text-3xl font-bold text-accent glow-teal-strong">
+          ${costSaved.toFixed(2)}/day
+        </div>
+        <div className="mt-1 font-mono text-[10px] text-muted">
+          {formatNumber(saved)} tokens saved @ $3/MTok
         </div>
       </div>
     </div>

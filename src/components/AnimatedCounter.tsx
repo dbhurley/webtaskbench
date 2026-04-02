@@ -8,6 +8,7 @@ interface AnimatedCounterProps {
   prefix?: string;
   decimals?: number;
   duration?: number;
+  label: string;
 }
 
 export function AnimatedCounter({
@@ -15,9 +16,11 @@ export function AnimatedCounter({
   suffix = "",
   prefix = "",
   decimals = 0,
-  duration = 2000,
+  duration = 1500,
+  label,
 }: AnimatedCounterProps) {
   const [display, setDisplay] = useState("0");
+  const [booted, setBooted] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const hasAnimated = useRef(false);
 
@@ -45,6 +48,8 @@ export function AnimatedCounter({
 
             if (progress < 1) {
               requestAnimationFrame(animate);
+            } else {
+              setBooted(true);
             }
           };
 
@@ -59,10 +64,19 @@ export function AnimatedCounter({
   }, [value, decimals, duration]);
 
   return (
-    <div ref={ref} className="text-4xl font-bold text-accent md:text-5xl">
-      {prefix}
-      {display}
-      {suffix}
+    <div ref={ref} className="flex flex-col items-center">
+      <div
+        className={`font-mono text-4xl font-bold text-accent md:text-5xl lg:text-6xl glow-teal animate-counter ${
+          booted ? "cursor-blink" : ""
+        }`}
+      >
+        {prefix}
+        {display}
+        {suffix}
+      </div>
+      <div className="mt-2 font-display text-xs font-semibold uppercase tracking-widest text-muted">
+        {label}
+      </div>
     </div>
   );
 }

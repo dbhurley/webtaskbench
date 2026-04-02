@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { benchmarkData, getSiteName, formatNumber } from "@/data/benchmark";
+import {
+  benchmarkData,
+  getSiteName,
+  formatTokensShort,
+} from "@/data/benchmark";
 
 type SortKey = "site" | "html_tokens" | "som_tokens" | "ratio";
 type SortDir = "asc" | "desc";
@@ -11,7 +15,10 @@ interface ResultsTableProps {
   pageSize?: number;
 }
 
-export function ResultsTable({ showSearch = true, pageSize = 44 }: ResultsTableProps) {
+export function ResultsTable({
+  showSearch = true,
+  pageSize = 44,
+}: ResultsTableProps) {
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("ratio");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
@@ -43,11 +50,6 @@ export function ResultsTable({ showSearch = true, pageSize = 44 }: ResultsTableP
   const totalPages = Math.ceil(sorted.length / pageSize);
   const paged = sorted.slice(page * pageSize, (page + 1) * pageSize);
 
-  const top3Ratios = useMemo(() => {
-    const s = [...benchmarkData].sort((a, b) => b.ratio - a.ratio);
-    return new Set(s.slice(0, 3).map((e) => e.url));
-  }, []);
-
   function handleSort(key: SortKey) {
     if (sortKey === key) {
       setSortDir(sortDir === "asc" ? "desc" : "asc");
@@ -60,92 +62,97 @@ export function ResultsTable({ showSearch = true, pageSize = 44 }: ResultsTableP
 
   const arrow = (key: SortKey) => {
     if (sortKey !== key) return "";
-    return sortDir === "asc" ? " \u2191" : " \u2193";
+    return sortDir === "asc" ? " ▲" : " ▼";
   };
+
+  function compressionBadge(ratio: number) {
+    if (ratio >= 10) {
+      return (
+        <span className="inline-block rounded bg-accent/15 px-2 py-0.5 font-mono text-xs font-bold text-accent">
+          {ratio.toFixed(1)}x
+        </span>
+      );
+    }
+    if (ratio >= 1) {
+      return (
+        <span className="inline-block rounded bg-warning/15 px-2 py-0.5 font-mono text-xs font-bold text-warning">
+          {ratio.toFixed(1)}x
+        </span>
+      );
+    }
+    return (
+      <span className="inline-block rounded bg-loss/15 px-2 py-0.5 font-mono text-xs font-bold text-loss">
+        {ratio.toFixed(1)}x
+      </span>
+    );
+  }
 
   return (
     <div>
       {showSearch && (
         <div className="mb-4">
-          <input
-            type="text"
-            placeholder="Search sites..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(0);
-            }}
-            className="w-full max-w-sm rounded-lg border border-border bg-surface px-4 py-2 text-sm text-text placeholder-muted outline-none focus:border-accent"
-          />
+          <div className="relative max-w-sm">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-xs text-muted">
+              &gt;
+            </span>
+            <input
+              type="text"
+              placeholder="search sites..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(0);
+              }}
+              className="w-full rounded border border-border bg-surface pl-7 pr-4 py-2 font-mono text-xs text-text placeholder-muted/50 outline-none transition-colors focus:border-accent/50"
+            />
+          </div>
         </div>
       )}
-      <div className="overflow-x-auto rounded-lg border border-border">
-        <table className="w-full text-sm">
+      <div className="overflow-x-auto rounded border border-border">
+        <table className="w-full font-mono text-xs">
           <thead>
             <tr className="border-b border-border bg-surface">
-              <th
-                className="cursor-pointer px-4 py-3 text-left text-muted hover:text-text"
-                onClick={() => handleSort("site")}
-              >
-                Site{arrow("site")}
-              </th>
-              <th
-                className="cursor-pointer px-4 py-3 text-right text-muted hover:text-text"
-                onClick={() => handleSort("html_tokens")}
-              >
-                HTML Tokens{arrow("html_tokens")}
-              </th>
-              <th
-                className="cursor-pointer px-4 py-3 text-right text-muted hover:text-text"
-                onClick={() => handleSort("som_tokens")}
-              >
-                SOM Tokens{arrow("som_tokens")}
-              </th>
-              <th
-                className="cursor-pointer px-4 py-3 text-right text-muted hover:text-text"
-                onClick={() => handleSort("ratio")}
-              >
-                Compression{arrow("ratio")}
-              </th>
-              <th className="px-4 py-3 text-right text-muted">Result</th>
+              {(
+                [
+                  ["site", "SITE", "text-left"],
+                  ["html_tokens", "HTML TOKENS", "text-right"],
+                  ["som_tokens", "SOM TOKENS", "text-right"],
+                  ["ratio", "COMPRESSION", "text-right"],
+                ] as const
+              ).map(([key, label, align]) => (
+                <th
+                  key={key}
+                  className={`cursor-pointer px-4 py-3 font-semibold tracking-wider text-muted transition-colors hover:text-blue ${align}`}
+                  onClick={() => handleSort(key)}
+                >
+                  {label}
+                  {arrow(key)}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            {paged.map((entry) => {
-              const isTop3 = top3Ratios.has(entry.url);
-              const isWin = entry.ratio > 1;
+            {paged.map((entry, i) => {
               return (
                 <tr
                   key={entry.url}
-                  className={`border-b border-border/50 transition-colors hover:bg-surface/50 ${
-                    isTop3 ? "bg-accent/5" : ""
-                  }`}
+                  className="group border-b border-border/40 transition-all hover:bg-surface-2 hover:border-l-2 hover:border-l-accent"
+                  style={{
+                    animationDelay: i < 20 ? `${i * 20}ms` : undefined,
+                    backgroundColor: i % 2 === 0 ? "#04080F" : "#080E18",
+                  }}
                 >
-                  <td className="px-4 py-3 font-medium">
-                    {isTop3 && (
-                      <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-accent" />
-                    )}
+                  <td className="px-4 py-2.5 font-medium text-text">
                     {entry.site}
                   </td>
-                  <td className="px-4 py-3 text-right text-muted">
-                    {formatNumber(entry.html_tokens)}
+                  <td className="px-4 py-2.5 text-right text-muted">
+                    {formatTokensShort(entry.html_tokens)}
                   </td>
-                  <td className="px-4 py-3 text-right text-accent">
-                    {formatNumber(entry.som_tokens)}
+                  <td className="px-4 py-2.5 text-right text-blue">
+                    {formatTokensShort(entry.som_tokens)}
                   </td>
-                  <td className="px-4 py-3 text-right">
-                    {entry.ratio.toFixed(1)}x
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    {isWin ? (
-                      <span className="text-win font-medium">
-                        &#10003; {entry.ratio}x
-                      </span>
-                    ) : (
-                      <span className="text-warning font-medium">
-                        &#9888; larger
-                      </span>
-                    )}
+                  <td className="px-4 py-2.5 text-right">
+                    {compressionBadge(entry.ratio)}
                   </td>
                 </tr>
               );
@@ -154,23 +161,23 @@ export function ResultsTable({ showSearch = true, pageSize = 44 }: ResultsTableP
         </table>
       </div>
       {totalPages > 1 && (
-        <div className="mt-4 flex items-center justify-center gap-2">
+        <div className="mt-4 flex items-center justify-center gap-3">
           <button
             onClick={() => setPage(Math.max(0, page - 1))}
             disabled={page === 0}
-            className="rounded border border-border px-3 py-1 text-sm text-muted hover:text-text disabled:opacity-30"
+            className="rounded border border-border px-3 py-1 font-mono text-xs text-muted transition-colors hover:border-accent hover:text-accent disabled:opacity-30"
           >
-            Prev
+            prev
           </button>
-          <span className="text-sm text-muted">
-            Page {page + 1} of {totalPages}
+          <span className="font-mono text-xs text-muted">
+            {page + 1}/{totalPages}
           </span>
           <button
             onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
             disabled={page >= totalPages - 1}
-            className="rounded border border-border px-3 py-1 text-sm text-muted hover:text-text disabled:opacity-30"
+            className="rounded border border-border px-3 py-1 font-mono text-xs text-muted transition-colors hover:border-accent hover:text-accent disabled:opacity-30"
           >
-            Next
+            next
           </button>
         </div>
       )}
