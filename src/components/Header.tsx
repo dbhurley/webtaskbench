@@ -19,6 +19,8 @@ export function Header() {
           {[
             { href: "/", label: "Observatory" },
             { href: "/sites", label: "All Sites" },
+            { href: "/test", label: "Test" },
+            { href: "/protocol", label: "Protocol" },
             { href: "/methodology", label: "Methodology" },
             { href: "/failed", label: "Failed" },
           ].map((link) => (
@@ -50,6 +52,8 @@ export function Header() {
           {[
             { href: "/", label: "Observatory" },
             { href: "/sites", label: "All Sites" },
+            { href: "/test", label: "Test" },
+            { href: "/protocol", label: "Protocol" },
             { href: "/methodology", label: "Methodology" },
             { href: "/failed", label: "Failed" },
           ].map((link) => (

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ResultsTable } from "@/components/ResultsTable";
 
 export const metadata: Metadata = {
@@ -18,7 +19,10 @@ export default function SitesPage() {
       </h1>
       <p className="mb-8 font-body text-sm text-muted">
         44 sites successfully fetched and analyzed. Click column headers to sort.
-        Search to filter by URL.
+        Search to filter by URL.{" "}
+        <Link href="/test" className="text-accent hover:text-accent/80 transition-colors">
+          Test any URL &rarr;
+        </Link>
       </p>
       <ResultsTable showSearch pageSize={44} />
 

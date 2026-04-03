@@ -5,6 +5,20 @@ export function Footer() {
         <div className="flex flex-col items-center gap-3 text-center">
           <div className="flex flex-wrap items-center justify-center gap-3 font-mono text-xs">
             <a
+              href="/test"
+              className="text-muted transition-colors hover:text-accent"
+            >
+              test
+            </a>
+            <span className="text-border">·</span>
+            <a
+              href="/protocol"
+              className="text-muted transition-colors hover:text-accent"
+            >
+              protocol
+            </a>
+            <span className="text-border">·</span>
+            <a
               href="https://github.com/plasmate-labs/plasmate-benchmarks"
               className="text-muted transition-colors hover:text-accent"
               target="_blank"

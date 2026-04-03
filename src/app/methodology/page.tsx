@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Methodology — WebTaskBench",
@@ -12,9 +13,18 @@ export default function MethodologyPage() {
       <div className="mb-2 font-mono text-xs tracking-[0.25em] text-muted">
         METHODOLOGY
       </div>
-      <h1 className="mb-8 font-display text-4xl font-bold">
+      <h1 className="mb-4 font-display text-4xl font-bold">
         How We Measure
       </h1>
+      <p className="mb-8 font-body text-sm text-muted">
+        This page describes the methodology used for webtaskbench.com results.
+        For the formal specification open to third-party benchmark submissions,
+        see the{" "}
+        <Link href="/protocol" className="text-accent hover:text-accent/80 transition-colors">
+          WebTaskBench Protocol
+        </Link>
+        .
+      </p>
 
       <div className="space-y-8 font-body text-sm leading-relaxed text-muted">
         <section>

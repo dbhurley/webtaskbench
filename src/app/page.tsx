@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { AnimatedCounter } from "@/components/AnimatedCounter";
 import { TopChart } from "@/components/TopChart";
 import { ResultsTable } from "@/components/ResultsTable";
@@ -189,7 +190,11 @@ export default function Home() {
             Re-run weekly against the latest Plasmate release. Watch the GitHub
             repo for update notifications. Track how the web is changing for AI
             agents. Which sites are improving their agent-friendliness. Which are
-            getting worse.
+            getting worse. Results follow the{" "}
+            <Link href="/protocol" className="text-accent hover:text-accent/80 transition-colors">
+              WebTaskBench Protocol v1.0
+            </Link>{" "}
+            — a reproducible methodology open to third-party submissions.
           </p>
           <div className="mt-6">
             <a
