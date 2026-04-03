@@ -7,7 +7,7 @@ import {
   formatTokensShort,
 } from "@/data/benchmark";
 
-type SortKey = "site" | "html_tokens" | "som_tokens" | "ratio";
+type SortKey = "site" | "category" | "html_tokens" | "som_tokens" | "ratio";
 type SortDir = "asc" | "desc";
 
 interface ResultsTableProps {
@@ -32,13 +32,24 @@ export function ResultsTable({
 
     if (search) {
       data = data.filter((e) =>
-        e.site.toLowerCase().includes(search.toLowerCase())
+        e.site.toLowerCase().includes(search.toLowerCase()) ||
+        (e.category ?? "").toLowerCase().includes(search.toLowerCase())
       );
     }
 
     data.sort((a, b) => {
-      const aVal = sortKey === "site" ? a.site : a[sortKey];
-      const bVal = sortKey === "site" ? b.site : b[sortKey];
+      let aVal: string | number;
+      let bVal: string | number;
+      if (sortKey === "site") {
+        aVal = a.site;
+        bVal = b.site;
+      } else if (sortKey === "category") {
+        aVal = a.category ?? "";
+        bVal = b.category ?? "";
+      } else {
+        aVal = a[sortKey];
+        bVal = b[sortKey];
+      }
       if (aVal < bVal) return sortDir === "asc" ? -1 : 1;
       if (aVal > bVal) return sortDir === "asc" ? 1 : -1;
       return 0;
@@ -115,6 +126,7 @@ export function ResultsTable({
               {(
                 [
                   ["site", "SITE", "text-left"],
+                  ["category", "CATEGORY", "text-left"],
                   ["html_tokens", "HTML TOKENS", "text-right"],
                   ["som_tokens", "SOM TOKENS", "text-right"],
                   ["ratio", "COMPRESSION", "text-right"],
@@ -144,6 +156,9 @@ export function ResultsTable({
                 >
                   <td className="px-4 py-2.5 font-medium text-text">
                     {entry.site}
+                  </td>
+                  <td className="px-4 py-2.5 text-muted">
+                    {entry.category ?? "—"}
                   </td>
                   <td className="px-4 py-2.5 text-right text-muted">
                     {formatTokensShort(entry.html_tokens)}

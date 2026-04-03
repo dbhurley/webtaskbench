@@ -3,8 +3,23 @@ import { TopChart } from "@/components/TopChart";
 import { ResultsTable } from "@/components/ResultsTable";
 import { CategoryCards } from "@/components/CategoryCards";
 import { TokenCalculator } from "@/components/TokenCalculator";
+import { benchmarkMeta } from "@/data/benchmark";
+
+function formatRunDate(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
 
 export default function Home() {
+  const delta =
+    benchmarkMeta.previous_avg_compression != null
+      ? (benchmarkMeta.avg_compression - benchmarkMeta.previous_avg_compression).toFixed(1)
+      : null;
+
   return (
     <div className="mx-auto max-w-7xl px-4">
       {/* Hero with scan lines */}
@@ -12,7 +27,7 @@ export default function Home() {
         <div className="relative z-10">
           {/* Eyebrow */}
           <div className="mb-6 font-mono text-xs tracking-[0.25em] text-muted">
-            WEBTASKBENCH / v1.0 / APR 2026
+            LIVE OBSERVATORY · UPDATED WEEKLY
           </div>
 
           {/* Giant headline */}
@@ -27,22 +42,30 @@ export default function Home() {
             Fewer tokens means faster agents, lower costs, and more context for reasoning.
           </p>
 
-          {/* 4 stat counters */}
-          <div className="mt-14 grid grid-cols-2 gap-8 md:grid-cols-4 md:gap-12">
-            <AnimatedCounter value={44} label="Sites Benchmarked" />
+          {/* Run stamp bar */}
+          <div className="mt-6 border-l-2 border-[#00E5A0] pl-4 font-mono text-sm text-[#00E5A0]">
+            v{benchmarkMeta.plasmate_version} &middot; {benchmarkMeta.sites_succeeded} sites &middot; Run{" "}
+            {formatRunDate(benchmarkMeta.run_date)}
+            {delta != null && benchmarkMeta.previous_version && (
+              <> &middot; &Delta; avg +{delta}x vs {benchmarkMeta.previous_version}</>
+            )}
+          </div>
+
+          {/* 3 stat counters */}
+          <div className="mt-14 grid grid-cols-2 gap-8 md:grid-cols-3 md:gap-12">
             <AnimatedCounter
-              value={17.5}
+              value={benchmarkMeta.avg_compression}
               suffix="x"
               decimals={1}
               label="Avg Compression"
             />
             <AnimatedCounter
-              value={6.74}
-              suffix="M"
-              decimals={2}
-              label="Tokens Saved"
+              value={benchmarkMeta.peak_compression}
+              suffix="x"
+              decimals={1}
+              label="Peak Compression"
             />
-            <AnimatedCounter value={36} suffix="/44" label="SOM Wins" />
+            <AnimatedCounter value={benchmarkMeta.sites_succeeded} label="Sites Benchmarked" />
           </div>
         </div>
       </section>
@@ -94,14 +117,14 @@ export default function Home() {
           <table className="w-full font-mono text-xs">
             <tbody>
               {[
-                ["Plasmate version", "0.3.0"],
+                ["Plasmate version", benchmarkMeta.plasmate_version],
                 ["HTML baseline", "curl -sL (raw HTTP, no rendering)"],
                 ["Token counter", "tiktoken cl100k_base (GPT-4 tokenizer)"],
-                ["Date", "April 1, 2026"],
+                ["Date", formatRunDate(benchmarkMeta.run_date)],
                 ["Platform", "Linux x86_64"],
                 [
                   "Sites",
-                  "51 attempted, 44 successful, 7 failed (anti-bot)",
+                  `${benchmarkMeta.sites_attempted} attempted, ${benchmarkMeta.sites_succeeded} successful, ${benchmarkMeta.sites_attempted - benchmarkMeta.sites_succeeded} failed (anti-bot)`,
                 ],
                 ["Source", "github.com/plasmate-labs/plasmate-benchmarks"],
               ].map(([key, val]) => (
@@ -115,30 +138,18 @@ export default function Home() {
             </tbody>
           </table>
         </div>
-      </section>
-
-      {/* Observatory Vision */}
-      <section className="py-12">
-        <div className="rounded border border-accent/20 bg-accent/[0.03] p-6 md:p-8">
-          <h2 className="font-display text-2xl font-bold">
-            Observatory Vision
-          </h2>
-          <p className="mt-2 font-body text-sm leading-relaxed text-muted">
-            This benchmark will be re-run weekly. Track how the web is changing
-            for AI agents. Which sites are improving their agent-friendliness.
-            Which are getting worse.
-          </p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <input
-              type="email"
-              placeholder="your@email.com"
-              className="flex-1 rounded border border-border bg-surface px-4 py-2 font-mono text-xs text-text placeholder-muted/40 outline-none transition-colors focus:border-accent/50"
-            />
-            <button className="rounded bg-accent px-6 py-2 font-display text-xs font-bold uppercase tracking-wider text-bg transition-all hover:shadow-[0_0_20px_rgba(0,229,160,0.3)]">
-              Notify me
-            </button>
-          </div>
-        </div>
+        <p className="mt-4 font-mono text-xs text-muted">
+          SOM is defined by the open{" "}
+          <a
+            href="https://somspec.org"
+            className="text-blue transition-colors hover:text-accent"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            SOMspec specification
+          </a>
+          .
+        </p>
       </section>
 
       {/* Contribute */}
@@ -166,6 +177,31 @@ export default function Home() {
             github.com/plasmate-labs/plasmate-benchmarks
           </a>
         </p>
+      </section>
+
+      {/* Observatory Vision */}
+      <section className="py-12">
+        <div className="rounded border border-accent/20 bg-accent/[0.03] p-6 md:p-8">
+          <h2 className="font-display text-2xl font-bold">
+            Observatory Vision
+          </h2>
+          <p className="mt-2 font-body text-sm leading-relaxed text-muted">
+            Re-run weekly against the latest Plasmate release. Watch the GitHub
+            repo for update notifications. Track how the web is changing for AI
+            agents. Which sites are improving their agent-friendliness. Which are
+            getting worse.
+          </p>
+          <div className="mt-6">
+            <a
+              href="https://github.com/plasmate-labs/plasmate-benchmarks"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 border border-[#00E5A0]/40 text-[#00E5A0] font-mono text-sm rounded hover:bg-[#00E5A0]/10 transition-colors"
+            >
+              ★ Watch on GitHub for weekly updates
+            </a>
+          </div>
+        </div>
       </section>
 
       {/* Badges */}

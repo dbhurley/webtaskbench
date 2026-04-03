@@ -1,0 +1,37 @@
+name: Weekly Benchmark
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Every Monday 6am UTC
+  workflow_dispatch:       # Allow manual trigger
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout plasmate-benchmarks
+        uses: actions/checkout@v4
+        with:
+          repository: plasmate-labs/plasmate-benchmarks
+          path: benchmarks
+
+      - name: Install Plasmate
+        run: |
+          curl -fsSL https://plasmate.app/install.sh | sh || \
+          cargo install plasmate --quiet
+
+      - name: Run benchmark
+        working-directory: benchmarks
+        run: |
+          ./run-benchmark.sh
+        env:
+          PLASMATE_TIMEOUT: 30000
+
+      - name: Update webtaskbench data
+        run: |
+          echo "Benchmark complete - update src/data/benchmark.ts with new results"
+          # TODO: Parse benchmark JSON output from benchmarks/results.json
+          # and regenerate src/data/benchmark.ts with updated entries and
+          # BenchmarkMeta values. This step currently requires manual
+          # intervention — future work will automate the data transform
+          # and auto-commit the updated file.

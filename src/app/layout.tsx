@@ -9,9 +9,9 @@ const azeretMono = Azeret_Mono({ subsets: ["latin"], variable: "--font-mono" });
 const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-body" });
 
 export const metadata: Metadata = {
-  title: "WebTaskBench — AI Agent Web Fetching Benchmark",
+  title: "WebTaskBench — AI Agent Web Benchmark Observatory",
   description:
-    "An open benchmark measuring token efficiency across the real web. Fewer tokens means faster agents, lower costs, and more context for reasoning.",
+    "Open benchmark tracking token efficiency across the real web for AI agents. Updated weekly. 17.5x average compression, 117x peak.",
 };
 
 export default function RootLayout({
