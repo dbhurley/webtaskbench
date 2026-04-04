@@ -12,16 +12,16 @@ export interface BenchmarkMeta {
 }
 
 export const benchmarkMeta: BenchmarkMeta = {
-  plasmate_version: "0.4.1",
-  run_date: "2026-04-01T00:00:00Z",
-  sites_attempted: 51,
-  sites_succeeded: 44,
-  avg_compression: 17.5,
-  median_compression: 9.4,
+  plasmate_version: "0.5.0",
+  run_date: "2026-04-04T14:00:00Z",
+  sites_attempted: 52,
+  sites_succeeded: 45,
+  avg_compression: 17.7,
+  median_compression: 9.6,
   peak_compression: 117.9,
-  peak_site: "cloud.google.com",
-  previous_version: "0.3.0",
-  previous_avg_compression: 16.8,
+  peak_site: "linear.app",
+  previous_version: "0.4.1",
+  previous_avg_compression: 17.5,
 };
 
 export interface BenchmarkEntry {
@@ -46,7 +46,7 @@ export const benchmarkData: BenchmarkEntry[] = [
   { url: "https://angular.dev", html_tokens: 31976, som_tokens: 4319, ratio: 7.4, category: "Dev Tools" },
   { url: "https://svelte.dev", html_tokens: 38122, som_tokens: 17625, ratio: 2.1, category: "Dev Tools" },
   { url: "https://nextjs.org", html_tokens: 122854, som_tokens: 5763, ratio: 21.3, category: "Dev Tools" },
-  { url: "https://vercel.com", html_tokens: 375962, som_tokens: 11243, ratio: 33.4, category: "SaaS & Cloud" },
+  { url: "https://vercel.com", html_tokens: 239805, som_tokens: 11715, ratio: 20.4, category: "SaaS & Cloud" },
   { url: "https://www.npmjs.com", html_tokens: 4142, som_tokens: 3144, ratio: 1.3, category: "Dev Tools" },
   { url: "https://pypi.org", html_tokens: 6075, som_tokens: 6406, ratio: 0.9, category: "Dev Tools" },
   { url: "https://www.rust-lang.org", html_tokens: 5107, som_tokens: 5056, ratio: 1.0, category: "Dev Tools" },
@@ -55,8 +55,9 @@ export const benchmarkData: BenchmarkEntry[] = [
   { url: "https://httpbin.org", html_tokens: 2968, som_tokens: 686, ratio: 4.3, category: "General" },
   { url: "https://jsonplaceholder.typicode.com", html_tokens: 2476, som_tokens: 3265, ratio: 0.7, category: "General" },
   { url: "https://www.bbc.com/news", html_tokens: 131203, som_tokens: 9925, ratio: 13.2, category: "News & Media" },
-  { url: "https://www.nytimes.com", html_tokens: 532445, som_tokens: 4827, ratio: 110.3, category: "News & Media" },
-  { url: "https://www.theguardian.com", html_tokens: 459324, som_tokens: 26392, ratio: 17.4, category: "News & Media" },
+  { url: "https://www.nytimes.com", html_tokens: 292769, som_tokens: 4884, ratio: 59.9, category: "News & Media" },
+  { url: "https://www.theguardian.com", html_tokens: 365743, som_tokens: 27156, ratio: 13.4, category: "News & Media" },
+  { url: "https://techcrunch.com", html_tokens: 108481, som_tokens: 1398, ratio: 77.5, category: "News & Media" },
   { url: "https://arstechnica.com", html_tokens: 148922, som_tokens: 15332, ratio: 9.7, category: "News & Media" },
   { url: "https://www.wired.com", html_tokens: 455285, som_tokens: 17729, ratio: 25.6, category: "News & Media" },
   { url: "https://medium.com", html_tokens: 4116, som_tokens: 1400, ratio: 2.9, category: "News & Media" },
@@ -67,7 +68,7 @@ export const benchmarkData: BenchmarkEntry[] = [
   { url: "https://docs.github.com", html_tokens: 29373, som_tokens: 7084, ratio: 4.1, category: "Dev Tools" },
   { url: "https://kubernetes.io/docs", html_tokens: 123067, som_tokens: 47900, ratio: 2.5, category: "Dev Tools" },
   { url: "https://aws.amazon.com", html_tokens: 105502, som_tokens: 4806, ratio: 21.9, category: "SaaS & Cloud" },
-  { url: "https://cloud.google.com", html_tokens: 759234, som_tokens: 6436, ratio: 117.9, category: "SaaS & Cloud" },
+  { url: "https://cloud.google.com", html_tokens: 522978, som_tokens: 7054, ratio: 74.1, category: "SaaS & Cloud" },
   { url: "https://azure.microsoft.com", html_tokens: 164128, som_tokens: 14318, ratio: 11.4, category: "SaaS & Cloud" },
   { url: "https://www.docker.com", html_tokens: 115453, som_tokens: 12436, ratio: 9.2, category: "SaaS & Cloud" },
   { url: "https://www.figma.com", html_tokens: 536872, som_tokens: 10949, ratio: 49.0, category: "SaaS & Cloud" },
@@ -84,7 +85,6 @@ export const failedSites = [
   { url: "reddit.com", reason: "Anti-bot detection (requires JavaScript rendering)" },
   { url: "w3.org", reason: "Heavy server-side protection and rate limiting" },
   { url: "reuters.com", reason: "Anti-bot detection (cookie consent wall + JS challenge)" },
-  { url: "techcrunch.com", reason: "Anti-bot detection (Cloudflare challenge page)" },
   { url: "dev.to", reason: "Heavy JavaScript rendering required (SPA shell only)" },
   { url: "mysql.com", reason: "Anti-bot detection (Oracle enterprise bot protection)" },
 ];
@@ -115,4 +115,4 @@ export const totalSomTokens = benchmarkData.reduce((sum, e) => sum + e.som_token
 export const tokensSaved = totalHtmlTokens - totalSomTokens;
 export const somWins = benchmarkData.filter((e) => e.ratio > 1).length;
 export const avgHtmlTokens = Math.round(totalHtmlTokens / totalSites);
-export const avgSomTokens = Math.round(avgHtmlTokens / 17.5);
+export const avgSomTokens = Math.round(avgHtmlTokens / benchmarkMeta.avg_compression);
