@@ -5,6 +5,7 @@ import { ResultsTable } from "@/components/ResultsTable";
 import { CategoryCards } from "@/components/CategoryCards";
 import { TokenCalculator } from "@/components/TokenCalculator";
 import { benchmarkMeta } from "@/data/benchmark";
+import { verticals } from "@/data/verticals";
 
 function formatRunDate(iso: string): string {
   const d = new Date(iso);
@@ -104,6 +105,44 @@ export default function Home() {
           Average compression ratio by site category
         </p>
         <CategoryCards />
+      </section>
+
+      {/* Browse by Category */}
+      <section className="py-12">
+        <h2 className="mb-1 font-display text-2xl font-bold">
+          Browse by Category
+        </h2>
+        <p className="mb-6 font-mono text-xs text-muted">
+          Deep-dive into vertical-specific benchmark data
+        </p>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {verticals.map((v) => {
+            const avg = v.entries.reduce((s, e) => s + e.ratio, 0) / v.entries.length;
+            return (
+              <Link
+                key={v.id}
+                href={`/${v.id}`}
+                className="group rounded border border-border bg-surface-2 p-5 transition-all hover:border-accent/40 hover:bg-accent/[0.03]"
+              >
+                <div className="font-display text-lg font-bold text-text group-hover:text-accent transition-colors">
+                  {v.label}
+                </div>
+                <div className="mt-3 flex items-baseline gap-3">
+                  <span className="font-display text-2xl font-bold text-accent">
+                    {avg.toFixed(1)}x
+                  </span>
+                  <span className="font-mono text-xs text-muted">avg compression</span>
+                </div>
+                <div className="mt-1 font-mono text-xs text-muted">
+                  {v.entries.length} sites measured
+                </div>
+                <div className="mt-3 font-mono text-xs text-accent/70 group-hover:text-accent transition-colors">
+                  View leaderboard &rarr;
+                </div>
+              </Link>
+            );
+          })}
+        </div>
       </section>
 
       {/* Token Calculator */}

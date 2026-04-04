@@ -1,10 +1,37 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+
+const navLinks = [
+  { href: "/", label: "Observatory" },
+  { href: "/sites", label: "All Sites" },
+  { href: "/test", label: "Test" },
+  { href: "/protocol", label: "Protocol" },
+  { href: "/methodology", label: "Methodology" },
+  { href: "/failed", label: "Failed" },
+];
+
+const verticalLinks = [
+  { href: "/news", label: "News & Media" },
+  { href: "/saas", label: "SaaS & Cloud" },
+  { href: "/devdocs", label: "Dev Docs" },
+];
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [verticalsOpen, setVerticalsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setVerticalsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-bg/90 backdrop-blur-md">
@@ -16,14 +43,7 @@ export function Header() {
           </span>
         </Link>
         <nav className="hidden items-center gap-1 md:flex">
-          {[
-            { href: "/", label: "Observatory" },
-            { href: "/sites", label: "All Sites" },
-            { href: "/test", label: "Test" },
-            { href: "/protocol", label: "Protocol" },
-            { href: "/methodology", label: "Methodology" },
-            { href: "/failed", label: "Failed" },
-          ].map((link) => (
+          {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -32,6 +52,29 @@ export function Header() {
               {link.label}
             </Link>
           ))}
+          {/* Verticals dropdown */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setVerticalsOpen(!verticalsOpen)}
+              className="rounded px-3 py-1.5 font-mono text-xs tracking-wide text-muted transition-colors hover:bg-surface-2 hover:text-text"
+            >
+              Verticals ▾
+            </button>
+            {verticalsOpen && (
+              <div className="absolute right-0 top-full mt-1 min-w-[160px] rounded border border-border bg-surface py-1 shadow-lg shadow-black/40">
+                {verticalLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="block px-4 py-2 font-mono text-xs tracking-wide text-muted transition-colors hover:bg-surface-2 hover:text-accent"
+                    onClick={() => setVerticalsOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </nav>
         <button
           className="md:hidden text-muted hover:text-accent transition-colors"
@@ -49,14 +92,7 @@ export function Header() {
       </div>
       {menuOpen && (
         <nav className="flex flex-col border-t border-border bg-surface px-4 py-2 md:hidden">
-          {[
-            { href: "/", label: "Observatory" },
-            { href: "/sites", label: "All Sites" },
-            { href: "/test", label: "Test" },
-            { href: "/protocol", label: "Protocol" },
-            { href: "/methodology", label: "Methodology" },
-            { href: "/failed", label: "Failed" },
-          ].map((link) => (
+          {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -66,6 +102,21 @@ export function Header() {
               {link.label}
             </Link>
           ))}
+          <div className="border-t border-border/40 mt-1 pt-1">
+            <span className="block py-2 font-mono text-[10px] uppercase tracking-widest text-muted/60">
+              Verticals
+            </span>
+            {verticalLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="py-2 pl-2 font-mono text-xs tracking-wide text-muted hover:text-accent block"
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
         </nav>
       )}
     </header>
