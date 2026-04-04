@@ -9,6 +9,9 @@ jobs:
   benchmark:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout webtaskbench
+        uses: actions/checkout@v4
+
       - name: Checkout plasmate-benchmarks
         uses: actions/checkout@v4
         with:
@@ -17,21 +20,48 @@ jobs:
 
       - name: Install Plasmate
         run: |
-          curl -fsSL https://plasmate.app/install.sh | sh || \
-          cargo install plasmate --quiet
+          curl -fsSL https://github.com/plasmate-labs/plasmate/releases/latest/download/plasmate-x86_64-linux -o /usr/local/bin/plasmate
+          chmod +x /usr/local/bin/plasmate
+
+      - name: Get Plasmate version
+        id: version
+        run: |
+          # Binary reports 0.1.0 due to build bug; get version from release tag
+          VER=$(curl -s https://api.github.com/repos/plasmate-labs/plasmate/releases/latest | jq -r '.tag_name' | sed 's/^v//')
+          echo "plasmate_version=$VER" >> "$GITHUB_OUTPUT"
 
       - name: Run benchmark
         working-directory: benchmarks
-        run: |
-          ./run-benchmark.sh
+        run: ./run-benchmark.sh
         env:
           PLASMATE_TIMEOUT: 30000
 
-      - name: Update webtaskbench data
+      - name: Find latest results file
+        id: results
         run: |
-          echo "Benchmark complete - update src/data/benchmark.ts with new results"
-          # TODO: Parse benchmark JSON output from benchmarks/results.json
-          # and regenerate src/data/benchmark.ts with updated entries and
-          # BenchmarkMeta values. This step currently requires manual
-          # intervention — future work will automate the data transform
-          # and auto-commit the updated file.
+          LATEST=$(ls -t benchmarks/results/benchmark-*.json 2>/dev/null | head -1)
+          if [ -z "$LATEST" ]; then echo "No results found"; exit 1; fi
+          echo "file=$LATEST" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Update benchmark data
+        run: |
+          node scripts/update-benchmark-data.js \
+            "${{ steps.results.outputs.file }}" \
+            "${{ steps.version.outputs.plasmate_version }}"
+
+      - name: Commit and push
+        run: |
+          git config user.name "WebTaskBench Bot"
+          git config user.email "webtaskbench@somspec.org"
+          git add src/data/benchmark.ts
+          if git diff --cached --quiet; then
+            echo "No data changes"
+          else
+            git commit -m "data: weekly benchmark update (Plasmate v${{ steps.version.outputs.plasmate_version }})"
+            git push
+          fi
