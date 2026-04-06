@@ -8,6 +8,7 @@ on:
 jobs:
   benchmark:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
       - name: Checkout webtaskbench
         uses: actions/checkout@v4
@@ -30,11 +31,18 @@ jobs:
           VER=$(curl -s https://api.github.com/repos/plasmate-labs/plasmate/releases/latest | jq -r '.tag_name' | sed 's/^v//')
           echo "plasmate_version=$VER" >> "$GITHUB_OUTPUT"
 
+      - name: Patch benchmark for CI timeouts
+        working-directory: benchmarks
+        run: |
+          # Wrap plasmate fetch with a 45s kill timeout so no single URL hangs the job
+          sed -i 's|SOM=$(plasmate fetch "$url"|SOM=$(timeout 45s plasmate fetch "$url" --timeout 30000|g' run-benchmark.sh
+          # Install tiktoken upfront so it doesn't stall mid-run
+          pip install tiktoken --quiet
+
       - name: Run benchmark
         working-directory: benchmarks
         run: ./run-benchmark.sh
-        env:
-          PLASMATE_TIMEOUT: 30000
+        timeout-minutes: 30
 
       - name: Find latest results file
         id: results
