@@ -9,9 +9,13 @@ jobs:
   benchmark:
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    permissions:
+      contents: write
     steps:
       - name: Checkout webtaskbench
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout plasmate-benchmarks
         uses: actions/checkout@v4
