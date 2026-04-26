@@ -1,0 +1,37 @@
+# WebTaskBench — AI Agent Web Benchmark Observatory
+
+> WebTaskBench measures token efficiency for AI-agent web fetching across a curated battery of real websites. Updated weekly. Latest run (Plasmate v0.5.1, 2026-04-20): 38/38 sites succeeded, 29.6× average compression, 118.5× peak (cloud.google.com).
+
+## Key resources
+
+- Site: https://webtaskbench.com
+- Methodology: https://webtaskbench.com/methodology
+- Formal protocol (third-party submissions): https://webtaskbench.com/protocol
+- Benchmark JSON (machine-readable): https://webtaskbench.com/api/v1/benchmark.json
+- Per-vertical leaderboards: /news, /saas, /devdocs
+- Failed-sites transparency page: /failed
+- Per-URL lookup tool: /test
+- Source: https://github.com/dbhurley/webtaskbench
+- Harness: https://github.com/plasmate-labs/plasmate-benchmarks
+- Engine being benchmarked: https://plasmate.app
+- Specification: https://somspec.org/spec
+- Live one-URL comparison: https://somordom.com
+- Compliance checker: https://somready.com
+- W3C Community Group: https://www.w3.org/community/web-content-browser-ai/
+
+## What it measures
+
+For each URL in the registry, two values are captured weekly:
+
+1. `html_tokens` — tokens in raw HTML via `curl -sL`, tokenized with `tiktoken` / `cl100k_base`
+2. `som_tokens` — tokens in the SOM (Semantic Object Model) output produced by the latest Plasmate release, same tokenizer
+
+Ratio = `html_tokens / som_tokens`. Higher is better. Failed sites (anti-bot / JS-only) are documented at /failed for transparency.
+
+## Methodology
+
+Conservative HTML baseline (no JS rendering) — under-states real-world ratios since browser-rendered DOMs typically contain more bloat. Tokenization standardized on tiktoken cl100k_base. Quality threshold for any benchmark publication: ≥20 sites, ≥3 categories, ≤40% from any single category, publicly accessible. See /protocol for the full v1.0 specification.
+
+## License
+
+Source MIT.
